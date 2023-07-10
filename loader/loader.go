@@ -24,7 +24,7 @@ const (
 )
 
 func (b baseLoader) Compile(path string, content []byte) error {
-	outputPath := strings.TrimSuffix(path, filepath.Ext(path)) + windowsExt
+	outputPath := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path)) + windowsExt
 
 	dir := "/tmp/test"
 	if err := os.MkdirAll(dir, 0750); err != nil {
