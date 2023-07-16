@@ -21,5 +21,6 @@
 go.work
 
 221b
+*.sh
 
 .idea

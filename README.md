@@ -32,10 +32,12 @@ Usage:
 Flags:
   -h, --help               help for bake
   -k, --key string         key to use for the xor
+  -o, --output string      Output path (e.g., /home/bin.exe)
   -s, --shellpath string   Path to the shell scrypt
 
 Global Flags:
       --debug   activate debug mode
+
 ```
 
 ## Example
