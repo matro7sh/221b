@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"github.com/cmepw/221b/logger"
 	"github.com/cmepw/221b/templates"
@@ -19,69 +18,80 @@ type Loader interface {
 type baseLoader struct{}
 
 const (
-	windowsExt = ".exe"
-	tmpFile    = "tmp.go"
+	tmpFile = "tmp.go"
+	tmpDir  = "/tmp/221b-compile"
 )
 
-func (b baseLoader) Compile(path string, content []byte) error {
-	outputPath := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path)) + windowsExt
-
-	dir := "/tmp/test"
-	if err := os.MkdirAll(dir, 0750); err != nil {
-		logger.Error(fmt.Errorf("could not create temporary directory"))
+func (b baseLoader) Compile(outputPath string, content []byte) error {
+	if err := b.setupTmpDir(content); err != nil {
 		return err
 	}
-
 	defer func() {
-		_ = os.RemoveAll(dir)
+		logger.Debug(fmt.Sprintf("cleanup temporary dir %s", tmpDir))
+		_ = os.RemoveAll(tmpDir)
 	}()
 
-	// Set environment
-	logger.Debug("write content to temporary file")
-	if err := os.WriteFile(filepath.Join(dir, tmpFile), content, 0666); err != nil {
-		logger.Error(fmt.Errorf("could not write tmp file"))
-		return err
-	}
-
-	if err := os.WriteFile(filepath.Join(dir, "go.mod"), []byte(templates.GoMod), 0666); err != nil {
-		logger.Error(fmt.Errorf("could not write tmp go.mod file"))
-		return err
-	}
-
-	initCmd := exec.Command("go", "get", "-u", "golang.org/x/sys/windows")
-	initCmd.Dir = dir
-	initCmd.Stderr = os.Stderr
-	initCmd.Env = append(os.Environ(), "GOOS=windows", "GOARCH=amd64")
-	if err := initCmd.Run(); err != nil {
+	err := b.execCmd("go", "get", "-u", "golang.org/x/sys/windows")
+	if err != nil {
 		logger.Error(fmt.Errorf("could not install dependency"))
 		return err
 	}
 
 	logger.Debug("dependency installed")
+	logger.Debug("start compiling binary")
 
-	pwd, err := os.Getwd()
+	relOutputPath, err := filepath.Abs(outputPath)
 	if err != nil {
 		return err
 	}
 
-	buildCmd := exec.Command(
+	err = b.execCmd(
 		"go",
 		"build",
 		"-ldflags",
 		"-s -w -H=windowsgui",
 		"-o",
-		filepath.Join(pwd, outputPath),
-		filepath.Join(dir, tmpFile),
+		relOutputPath,
+		filepath.Join(tmpDir, tmpFile),
 	)
-	buildCmd.Env = append(os.Environ(), "GOOS=windows", "GOARCH=amd64")
-	buildCmd.Stderr = os.Stderr
-	buildCmd.Dir = dir
-
-	if err := buildCmd.Run(); err != nil {
+	if err != nil {
 		logger.Error(fmt.Errorf("failed to compile"))
 		return err
 	}
 
-	logger.Info(fmt.Sprintf("file compiled to %s", filepath.Join(pwd, outputPath)))
+	logger.Info(fmt.Sprintf("file compiled to %s", relOutputPath))
+
+	return nil
+}
+
+func (b baseLoader) execCmd(name string, args ...string) error {
+	logger.Debug(fmt.Sprintf("execute command %s", name))
+
+	cmd := exec.Command(name, args...)
+	cmd.Env = append(os.Environ(), "GOOS=windows", "GOARCH=amd64")
+	cmd.Stderr = os.Stderr
+	cmd.Dir = tmpDir
+
+	return cmd.Run()
+}
+
+func (b baseLoader) setupTmpDir(goFile []byte) error {
+	logger.Debug(fmt.Sprintf("setup temporary directory %s", tmpDir))
+
+	if err := os.MkdirAll(tmpDir, 0750); err != nil {
+		logger.Error(fmt.Errorf("could not create temporary directory"))
+		return err
+	}
+
+	if err := os.WriteFile(filepath.Join(tmpDir, tmpFile), goFile, 0666); err != nil {
+		logger.Error(fmt.Errorf("could not write tmp file"))
+		return err
+	}
+
+	if err := os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(templates.GoMod), 0666); err != nil {
+		logger.Error(fmt.Errorf("could not write tmp go.mod file"))
+		return err
+	}
+
 	return nil
 }

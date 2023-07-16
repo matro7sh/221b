@@ -5,8 +5,6 @@ import (
 	"os"
 )
 
-var DebugMode = false
-
 func Debug(msg string) {
 	if DebugMode {
 		fmt.Printf("[*] %s\n", msg)
