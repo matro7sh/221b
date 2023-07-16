@@ -22,5 +22,6 @@ go.work
 
 221b
 *.sh
+payload_usage/
 
 .idea

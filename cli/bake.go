@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/cmepw/221b/encryption/xor"
 	"github.com/cmepw/221b/loader"
 	"github.com/cmepw/221b/logger"
 )
@@ -16,11 +15,13 @@ var (
 	shellPath string
 	key       string
 	output    string
+	method    string
 )
 
 var (
-	ErrMissingShellPath = fmt.Errorf("missing shellPath argument")
-	ErrMissingKey       = fmt.Errorf("missing key argument")
+	ErrMissingShellPath   = fmt.Errorf("missing shellPath argument")
+	ErrMissingKey         = fmt.Errorf("missing key argument")
+	ErrMethodNotSupported = fmt.Errorf("provided encryption method isn't supported, please choose: 'aes', 'xor'")
 )
 
 var bake = &cobra.Command{
@@ -40,6 +41,12 @@ var bake = &cobra.Command{
 			logger.Warn(fmt.Sprintf("output path set to default: %s", output))
 		}
 
+		loader, ok := loader.Method[method]
+		if !ok {
+			logger.Fatal(ErrMethodNotSupported)
+		}
+
+		logger.Info(fmt.Sprintf("use %s encryption method", method))
 		logger.Debug(fmt.Sprintf("baking %s with key %s", shellPath, key))
 
 		logger.Debug(fmt.Sprintf("reading %s", shellPath))
@@ -48,13 +55,16 @@ var bake = &cobra.Command{
 			logger.Fatal(err)
 		}
 
-		logger.Debug(fmt.Sprintf("encrypting %s", shellPath))
-		encryptedShell := xor.Encrypt(file, []byte(key))
+		logger.Info(fmt.Sprintf("encrypting %s", shellPath))
 
-		logger.Debug(fmt.Sprintf("injecting encrypted shell into payload"))
+		encryptedShell, err := loader.Encrypt(file, []byte(key))
+		if err != nil {
+			logger.Fatal(err)
+		}
 
-		xorLoader := loader.NewXorLoader([]byte(key))
-		content, err := xorLoader.Load(encryptedShell)
+		logger.Info(fmt.Sprintf("loading encrypted shell into payload"))
+
+		content, err := loader.Load(encryptedShell, []byte(key))
 		if err != nil {
 			logger.Fatal(err)
 		}
@@ -64,7 +74,9 @@ var bake = &cobra.Command{
 			fmt.Println(string(content))
 		}
 
-		if err := xorLoader.Compile(output, content); err != nil {
+		logger.Info("compiling binary")
+
+		if err := loader.Compile(output, content); err != nil {
 			logger.Fatal(err)
 		}
 	},
@@ -74,4 +86,5 @@ func init() {
 	bake.Flags().StringVarP(&shellPath, "shellPath", "s", "", "path to the shell scrypt")
 	bake.Flags().StringVarP(&key, "key", "k", "", "key to use for the xor")
 	bake.Flags().StringVarP(&output, "output", "o", "", "output path (e.g., /home/bin.exe)")
+	bake.Flags().StringVarP(&method, "method", "m", "xor", "encryption method")
 }

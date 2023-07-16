@@ -6,13 +6,21 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/cmepw/221b/encryption"
 	"github.com/cmepw/221b/logger"
 	"github.com/cmepw/221b/templates"
 )
 
+// Method gather all loading and encryption method.
+var Method = map[string]Loader{
+	"xor": Xor{},
+	"aes": Aes{},
+}
+
 type Loader interface {
-	Load(content []byte) ([]byte, error)
+	Load(content, key []byte) ([]byte, error)
 	Compile(path string, content []byte) error
+	encryption.Encryption
 }
 
 type baseLoader struct{}
