@@ -10,12 +10,12 @@ import (
 	"github.com/cmepw/221b/templates"
 )
 
-type Xor struct {
+type Aes struct {
 	baseLoader
-	encryption.Xor
+	encryption.Aes
 }
 
-func (x Xor) Load(content, key []byte) ([]byte, error) {
+func (a Aes) Load(content, key []byte) ([]byte, error) {
 	tmpl, err := template.New("loader").Funcs(template.FuncMap{
 		"key": func() string {
 			return string(key)
@@ -29,7 +29,7 @@ func (x Xor) Load(content, key []byte) ([]byte, error) {
 
 			return strings.Join(result, ", ") + ","
 		},
-	}).Parse(templates.XorTmpl)
+	}).Parse(templates.AesTmpl)
 	if err != nil {
 		return nil, err
 	}

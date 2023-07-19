@@ -1,4 +1,4 @@
-package xor
+package encryption
 
 import (
 	"bytes"
@@ -33,10 +33,14 @@ func main() {
 
 	for name, tt := range testsCases {
 		t.Run(name, func(t *testing.T) {
-			encryptedContent := Encrypt(bytes.Clone(tt.content), tt.key)
+			xor := Xor{}
 
+			encryptedContent, err := xor.Encrypt(bytes.Clone(tt.content), tt.key)
+			require.NoError(t, err)
 			require.NotEqual(t, tt.content, encryptedContent)
-			decryptedContent := Decrypt(encryptedContent, tt.key)
+
+			decryptedContent, err := xor.Decrypt(encryptedContent, tt.key)
+			require.NoError(t, err)
 			require.Equal(t, tt.content, decryptedContent)
 		})
 	}
