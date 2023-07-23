@@ -20,6 +20,9 @@ func (a Aes) Load(content, key []byte) ([]byte, error) {
 		"key": func() string {
 			return string(key)
 		},
+		"base_path": func() string {
+			return base_path
+		},
 		"shellcode": func() string {
 			result := []string{}
 

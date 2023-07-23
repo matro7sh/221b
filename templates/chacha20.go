@@ -1,6 +1,7 @@
 package templates
 
 var ChaCha20Tmpl = `
+//go:generate goversioninfo -icon={{ base_path }}/misc/pwned.ico -manifest={{ base_path }}/misc/goversioninfo.exe.manifest
 package main
 
 import (

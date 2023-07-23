@@ -2,6 +2,7 @@ package loader
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -31,6 +32,10 @@ const (
 	tmpDir  = "/tmp/221b-compile"
 )
 
+var (
+	base_path, _ = os.Getwd()
+)
+
 func (b baseLoader) Compile(outputPath string, content []byte) error {
 	if err := b.setupTmpDir(content); err != nil {
 		return err
@@ -54,6 +59,11 @@ func (b baseLoader) Compile(outputPath string, content []byte) error {
 		return err
 	}
 
+	_ = b.execCmd(
+		"go",
+		"generate",
+	)
+
 	err = b.execCmd(
 		"go",
 		"build",
@@ -61,7 +71,6 @@ func (b baseLoader) Compile(outputPath string, content []byte) error {
 		"-s -w -H=windowsgui",
 		"-o",
 		relOutputPath,
-		filepath.Join(tmpDir, tmpFile),
 	)
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to compile"))
@@ -91,6 +100,12 @@ func (b baseLoader) setupTmpDir(goFile []byte) error {
 		logger.Error(fmt.Errorf("could not create temporary directory"))
 		return err
 	}
+
+	data, err := ioutil.ReadFile(filepath.Join(base_path, "versioninfo.json"))
+	if err != nil {
+		panic(err)
+	}
+	_ = ioutil.WriteFile(filepath.Join(tmpDir, "versioninfo.json"), data, 0666)
 
 	if err := os.WriteFile(filepath.Join(tmpDir, tmpFile), goFile, 0666); err != nil {
 		logger.Error(fmt.Errorf("could not write tmp file"))
