@@ -19,8 +19,18 @@
         "FileSubType": "00"
     },
     "StringFileInfo": {
-        "Comments": "jawive",
-        "CompanyName": "Souin"
+        "Comments": "Bake shellcode to get malicious.exe",
+        "CompanyName": "221b",
+        "FileDescription": "im a malware",
+        "FileVersion": "4.0",
+        "InternalName": "TheMalware",
+        "LegalCopyright": "@TomChv",
+        "LegalTrademarks": "",
+        "OriginalFilename": "",
+        "PrivateBuild": "",
+        "ProductName": "Maldev",
+        "ProductVersion": "v1.0.0.0",
+        "SpecialBuild": ""
     },
     "VarFileInfo": {
         "Translation": {
