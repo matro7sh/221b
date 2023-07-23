@@ -13,8 +13,9 @@ import (
 
 // Method gather all loading and encryption method.
 var Method = map[string]Loader{
-	"xor": Xor{},
-	"aes": Aes{},
+	"xor":      Xor{},
+	"aes":      Aes{},
+	"chacha20": ChaCha20{},
 }
 
 type Loader interface {
@@ -39,7 +40,7 @@ func (b baseLoader) Compile(outputPath string, content []byte) error {
 		_ = os.RemoveAll(tmpDir)
 	}()
 
-	err := b.execCmd("go", "get", "-u", "golang.org/x/sys/windows")
+	err := b.execCmd("go", "get", "-u", "golang.org/x/sys/windows", "golang.org/x/crypto")
 	if err != nil {
 		logger.Error(fmt.Errorf("could not install dependency"))
 		return err
