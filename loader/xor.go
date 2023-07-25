@@ -20,7 +20,7 @@ func (x Xor) Load(content, key []byte) ([]byte, error) {
 		"key": func() string {
 			return string(key)
 		},
-		"base_path": func() string {
+		"basepath": func() string {
 			return basepath
 		},
 		"shellcode": func() string {
