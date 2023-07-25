@@ -19,16 +19,16 @@
         "FileSubType": "00"
     },
     "StringFileInfo": {
-        "Comments": "Bake shellcode to get malicious.exe",
+        "Comments": "Edit me, im malicious binary",
         "CompanyName": "221b",
-        "FileDescription": "im a malware",
+        "FileDescription": "edit me, im a malware",
         "FileVersion": "4.0",
         "InternalName": "TheMalware",
-        "LegalCopyright": "@TomChv",
+        "LegalCopyright": "@TomChv / @Jenaye_fr",
         "LegalTrademarks": "",
-        "OriginalFilename": "",
+        "OriginalFilename": "malicious.exe",
         "PrivateBuild": "",
-        "ProductName": "Maldev",
+        "ProductName": "Support",
         "ProductVersion": "v1.0.0.0",
         "SpecialBuild": ""
     },

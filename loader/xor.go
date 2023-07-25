@@ -21,7 +21,7 @@ func (x Xor) Load(content, key []byte) ([]byte, error) {
 			return string(key)
 		},
 		"base_path": func() string {
-			return base_path
+			return basepath
 		},
 		"shellcode": func() string {
 			result := []string{}

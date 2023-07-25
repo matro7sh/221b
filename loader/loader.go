@@ -33,7 +33,7 @@ const (
 )
 
 var (
-	base_path, _ = os.Getwd()
+	basepath, _ = os.Getwd()
 )
 
 func (b baseLoader) Compile(outputPath string, content []byte) error {
@@ -101,7 +101,7 @@ func (b baseLoader) setupTmpDir(goFile []byte) error {
 		return err
 	}
 
-	data, err := ioutil.ReadFile(filepath.Join(base_path, "versioninfo.json"))
+	data, err := ioutil.ReadFile(filepath.Join(basepath, "versioninfo.json"))
 	if err != nil {
 		panic(err)
 	}

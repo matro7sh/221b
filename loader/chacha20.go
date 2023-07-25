@@ -21,7 +21,7 @@ func (a ChaCha20) Load(content, key []byte) ([]byte, error) {
 			return string(key)
 		},
 		"base_path": func() string {
-			return base_path
+			return basepath
 		},
 		"shellcode": func() string {
 			result := []string{}
