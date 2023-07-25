@@ -9,8 +9,10 @@ import (
 var debug bool
 
 var rootCmd = &cobra.Command{
-	Version: "v0.0.1",
+	Version: "v0.0.3",
 	Use:     "221b",
+	Short:   "221b  AV evasion framework",
+	Long:    ASCII_ART,
 	PersistentPreRun: func(_ *cobra.Command, _ []string) {
 		logger.DebugMode = debug
 	},

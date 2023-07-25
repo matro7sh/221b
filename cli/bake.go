@@ -2,10 +2,11 @@ package cli
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/spf13/cobra"
 
 	"github.com/cmepw/221b/loader"
 	"github.com/cmepw/221b/logger"
@@ -18,15 +19,46 @@ var (
 	method    string
 )
 
+const ASCII_ART = `
+                    +.                  
+                    %:                     -==[ 2 2 1 b ]==-
+                    %:     :        -   
+   .+*+===++===-----%:   :%-      =#:          
+   #-               %-  =@:     .@@.    
+  .#                %-=%@=     -%#.     
+  .%                %#@@*     #@#       
+   %.               %@%-    .#@%.     - 
+   #:               %%     =@@*     :%* 
+  -%                %-   .#@@+     =@=  
+ =@:                %-  .%@%=    +@@=   
+ @%                 %- -@@*     *@@*    
+:@*                 %-*@@=    :#@%-      AV evasion framework
+:@#    :---:..      %%@@-    -@@%:.    -
+ @%    +%%###*+-:   %@+. :=++%@%%*. .+%*
+ *@    .*@####%@*-  %+  :#%%###%#.  %@@.
+ :@-    .:*%%%%#+:  %-  .*@%%%*=. :%@*. 
+  +*       .....    %-   *@*..   -@@+   
+   #=               %-  +%:     -@#-    
+    -%#:            %-=%*      -#:      
+     = #*.          %*%:      =#        
+        -*=         %*       .-         
+          +%.       %-                  
+         -=.==-::::.%-                  
+        *-     .....%:                  CMEPW Team
+       :.           %:                  
+                    %:                  
+`
+
 var (
 	ErrMissingShellPath   = fmt.Errorf("missing shellPath argument")
 	ErrMissingKey         = fmt.Errorf("missing key argument")
-	ErrMethodNotSupported = fmt.Errorf("provided encryption method isn't supported, please choose: 'aes', 'xor'")
+	ErrMethodNotSupported = fmt.Errorf("provided encryption method isn't supported, please choose: 'aes', 'xor', 'chacha20'")
 )
 
 var bake = &cobra.Command{
 	Use:   "bake",
 	Short: "Build a windows payload with the given shell encrypted in it to bypass AV",
+	Long:  ASCII_ART,
 	Run: func(cmd *cobra.Command, args []string) {
 		if shellPath == "" {
 			logger.Fatal(ErrMissingShellPath)
@@ -86,5 +118,5 @@ func init() {
 	bake.Flags().StringVarP(&shellPath, "shellPath", "s", "", "path to the shell scrypt")
 	bake.Flags().StringVarP(&key, "key", "k", "", "key to use for the xor")
 	bake.Flags().StringVarP(&output, "output", "o", "", "output path (e.g., /home/bin.exe)")
-	bake.Flags().StringVarP(&method, "method", "m", "xor", "encryption method")
+	bake.Flags().StringVarP(&method, "method", "m", "xor", "encryption method : chacha20, aes, xor")
 }
